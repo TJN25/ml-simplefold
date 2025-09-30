@@ -81,8 +81,15 @@ def initialize_folding_model(args):
     elif args.backend == 'mlx':
         device = "cpu"
         # replace torch implementations with mlx
-        with open(cfg_path, "r") as f:
-            yaml_str = f.read()
+        try:
+            with open(cfg_path, "r") as f:
+                yaml_str = f.read()
+        except FileNotFoundError:
+            script_dir = os.path.dirname(os.path.realpath(__file__))
+            project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
+            cfg_path_abs = os.path.join(project_root, cfg_path)
+            with open(cfg_path_abs, "r") as f:
+                yaml_str = f.read()
         yaml_str = yaml_str.replace('torch', 'mlx')
 
         model_config = omegaconf.OmegaConf.create(yaml_str)
@@ -109,14 +116,27 @@ def initialize_plddt_module(args, device):
     plddt_checkpoint = torch.load(plddt_ckpt_path, map_location="cpu", weights_only=False)
 
     if args.backend == "torch":
-        plddt_config = omegaconf.OmegaConf.load(plddt_module_path)
+        try:
+            plddt_config = omegaconf.OmegaConf.load(plddt_module_path)
+        except FileNotFoundError:
+            script_dir = os.path.dirname(os.path.realpath(__file__))
+            project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
+            plddt_module_path_abs = os.path.join(project_root, plddt_module_path)
+            plddt_config = omegaconf.OmegaConf.load(plddt_module_path_abs)
         plddt_out_module = hydra.utils.instantiate(plddt_config)
         plddt_out_module.load_state_dict(plddt_checkpoint, strict=True)
         plddt_out_module = plddt_out_module.to(device)
     elif args.backend == "mlx":
         # replace torch implementations with mlx
-        with open(plddt_module_path, "r") as f:
-            yaml_str = f.read()
+        try:
+            with open(plddt_module_path, "r") as f:
+                yaml_str = f.read()
+        except FileNotFoundError:
+            script_dir = os.path.dirname(os.path.realpath(__file__))
+            project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
+            plddt_module_path_abs = os.path.join(project_root, plddt_module_path)
+            with open(plddt_module_path_abs, "r") as f:
+                yaml_str = f.read()
         yaml_str = yaml_str.replace('torch', 'mlx')
 
         plddt_config = omegaconf.OmegaConf.create(yaml_str)
@@ -137,14 +157,27 @@ def initialize_plddt_module(args, device):
     plddt_latent_checkpoint = torch.load(plddt_latent_ckpt_path, map_location="cpu", weights_only=False)
 
     if args.backend == "torch":
-        plddt_latent_config = omegaconf.OmegaConf.load(plddt_latent_config_path)
+        try:
+            plddt_latent_config = omegaconf.OmegaConf.load(plddt_latent_config_path)
+        except FileNotFoundError:
+            script_dir = os.path.dirname(os.path.realpath(__file__))
+            project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
+            plddt_latent_config_path_abs = os.path.join(project_root, plddt_latent_config_path)
+            plddt_latent_config = omegaconf.OmegaConf.load(plddt_latent_config_path_abs)
         plddt_latent_module = hydra.utils.instantiate(plddt_latent_config)
         plddt_latent_module.load_state_dict(plddt_latent_checkpoint, strict=True)
         plddt_latent_module = plddt_latent_module.to(device)
     elif args.backend == "mlx":
         # replace torch implementations with mlx
-        with open(plddt_latent_config_path, "r") as f:
-            yaml_str = f.read()
+        try:
+            with open(plddt_latent_config_path, "r") as f:
+                yaml_str = f.read()
+        except FileNotFoundError:
+            script_dir = os.path.dirname(os.path.realpath(__file__))
+            project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
+            plddt_latent_config_path_abs = os.path.join(project_root, plddt_latent_config_path)
+            with open(plddt_latent_config_path_abs, "r") as f:
+                yaml_str = f.read()
         yaml_str = yaml_str.replace('torch', 'mlx')
 
         plddt_latent_config = omegaconf.OmegaConf.create(yaml_str)
