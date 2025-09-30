@@ -68,7 +68,13 @@ def initialize_folding_model(args):
     # load model checkpoint
     if args.backend == 'torch':
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        model_config = omegaconf.OmegaConf.load(cfg_path)
+        try:
+            model_config = omegaconf.OmegaConf.load(cfg_path)
+        except FileNotFoundError:
+            script_dir = os.path.dirname(os.path.realpath(__file__))
+            project_root = os.path.abspath(os.path.join(script_dir, "..", ".."))
+            cfg_path_abs = os.path.join(project_root, cfg_path)
+            model_config = omegaconf.OmegaConf.load(cfg_path_abs)
         model = hydra.utils.instantiate(model_config)
         model.load_state_dict(checkpoint, strict=True)
         model = model.to(device)
